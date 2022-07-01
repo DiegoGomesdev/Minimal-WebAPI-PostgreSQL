@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using WebAPI_Equipamentos.Contexto;
 using WebAPI_Equipamentos.Models;
+using System.Threading.Tasks;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,10 +26,14 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 
+// TABELA EQUIPAMENTOS METODOS
+
 app.MapPost("AdicionarEquipamento", async(Equipment equipment, Contexto contexto) =>
 {
     contexto.Equipment.Add(equipment);
     await contexto.SaveChangesAsync();
+    return Results.Created($"/Equipamento Adicionado/{equipment.Id}", equipment);
+
 })
   .Produces<Equipment>(StatusCodes.Status201Created)
   .Produces(StatusCodes.Status400BadRequest);
@@ -47,22 +52,24 @@ app.MapGet("ListarEquipamentos", async (Contexto contexto) =>
      return await contexto.Equipment.ToListAsync();
 }); 
 
-app.MapGet("ListarEquipamento/{id}", async (Guid id,Contexto contexto) =>
-{
-    var equipamentoLista = await contexto.Equipment.FirstOrDefaultAsync(eq => eq.Id == id);
+app.MapGet("PesquisarEquipamento/{id}", async (Guid id,Contexto contexto) =>
 
-        return  equipamentoLista;
+    await contexto.Equipment.FindAsync(id) is Equipment equipmento
+    ? Results.Ok(equipmento)
+    : Results.NotFound());
+
+app.MapPut("AtualizarEquipamento/{id}", async (Guid id, Equipment inputEquip, Contexto contexto) =>
+{
+    var AtualizarEquipamento = await contexto.Equipment.FindAsync(id);
+    if (AtualizarEquipamento is null) return Results.NotFound();
+    AtualizarEquipamento.Name = inputEquip.Name;
+
+    await contexto.SaveChangesAsync();
+
+    return Results.NoContent();
 });
 
-app.MapPut("AtualizarEquipamento/{id}", async (Guid id, Contexto contexto) =>
-{
-    var equipamentoAtualizar = await contexto.Equipment.FirstOrDefaultAsync(eq => eq.Id == id);
-    if (equipamentoAtualizar != null)
-    {
-        contexto.Equipment.Update(equipamentoAtualizar);
-        await contexto.SaveChangesAsync();
-    }   
-});
+// MODELOS DE EQUIPAMENTO METODOS
 
 app.MapPost("AdicionarModelosEquipamento", async (Equipment_model equipment_model, Contexto contexto) =>
 {
@@ -84,6 +91,13 @@ app.MapGet("ListarModelosEquipamentos", async (Contexto contexto) =>
 {
     return await contexto.Equipment_model.ToListAsync();
 }).WithTags("Modelos Equipamentos");
+
+app.MapGet("PesquisarModeloEquipamento/{id}", async (Guid id, Contexto contexto) =>
+
+    await contexto.Equipment_model.FindAsync(id) is Equipment_model equipmentModel
+    ? Results.Ok(equipmentModel)
+    : Results.NotFound())
+    .WithTags("Modelos Equipamentos");
 
 app.MapPut("AtualizarModeloEquipamento/{id}", async (Guid id, Contexto contexto) =>
 {
