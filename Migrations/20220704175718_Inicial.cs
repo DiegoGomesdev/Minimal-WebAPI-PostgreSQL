@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace WebAPI_Equipamentos.Migrations
 {
-    public partial class initial : Migration
+    public partial class Inicial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -43,7 +44,7 @@ namespace WebAPI_Equipamentos.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Equipment_model_state_hourly_earnings", x => x.Equipment_model_id);
+
                 });
 
             migrationBuilder.CreateTable(
@@ -52,12 +53,12 @@ namespace WebAPI_Equipamentos.Migrations
                 {
                     Equipment_id = table.Column<Guid>(type: "uuid", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Lat = table.Column<int>(type: "integer", nullable: false),
-                    Lon = table.Column<int>(type: "integer", nullable: false)
+                    Lat = table.Column<double>(type: "double precision", nullable: false),
+                    Lon = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Equipment_position_history", x => x.Equipment_id);
+
                 });
 
             migrationBuilder.CreateTable(
@@ -83,7 +84,6 @@ namespace WebAPI_Equipamentos.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Equipment_state_history", x => x.Equipment_id);
                 });
         }
 

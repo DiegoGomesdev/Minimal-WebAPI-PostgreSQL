@@ -1,20 +1,13 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using WebAPI_Equipamentos.Contexto;
 using WebAPI_Equipamentos.Models;
-using System.Threading.Tasks;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<Contexto>(options 
-=> options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
-);
-
-/*builder.Services.AddEntityFrameworkNpgsql().AddDbContext<Contexto>(option
-    => option.UseNpgsql("User ID=postgres;Password=2915;Server=localhost;Port=5432;Database=dbequipamentos;Pooling=true;SearchPath=operation;"));*/
-
+=> options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -26,8 +19,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 
-// TABELA EQUIPAMENTOS METODOS
-
+#region Equipment Actions
 app.MapPost("AdicionarEquipamento", async(Equipment equipment, Contexto contexto) =>
 {
     contexto.Equipment.Add(equipment);
@@ -68,8 +60,9 @@ app.MapPut("AtualizarEquipamento/{id}", async (Guid id, Equipment inputEquip, Co
 
     return Results.NoContent();
 });
+#endregion
 
-// MODELOS DE EQUIPAMENTO METODOS
+#region Equipment_model Actions
 
 app.MapPost("AdicionarModelosEquipamento", async (Equipment_model equipment_model, Contexto contexto) =>
 {
@@ -108,5 +101,98 @@ app.MapPut("AtualizarModeloEquipamento/{id}", async (Guid id, Contexto contexto)
         await contexto.SaveChangesAsync();
     }
 }).WithTags("Modelos Equipamentos");
+#endregion
+
+#region Equipment_model_state_hourly_earnings Actions
+app.MapPost("Adicionar EquipmentModel_SHE ", async (Equipment_model_state_hourly_earnings equipment_mshe, Contexto contexto) =>
+{
+    contexto.Equipment_model_state_hourly_earnings.Add(equipment_mshe);
+    await contexto.SaveChangesAsync();
+    return Results.Created($"/Equipamento Adicionado/{equipment_mshe.Equipment_model_id}", equipment_mshe);
+
+}) .WithTags("Equipment_model_state_hourly_earnings");
+
+app.MapDelete("Excluir EquipmentModel_SHE/{id}", async (Guid id, Contexto contexto) =>
+{
+    var equipModelsheExcluir = await contexto.Equipment_model_state_hourly_earnings.FirstOrDefaultAsync(eq => eq.Equipment_model_id == id);
+    if (equipModelsheExcluir != null)
+    {
+        contexto.Equipment_model_state_hourly_earnings.Remove(equipModelsheExcluir);
+        await contexto.SaveChangesAsync();
+    }
+}).WithTags("Equipment_model_state_hourly_earnings");
+
+app.MapGet("Listar EquipmentModel_SHE", async (Contexto contexto) => 
+{ 
+    return await contexto.Equipment_model_state_hourly_earnings.ToListAsync(); 
+})
+   .WithTags("Equipment_model_state_hourly_earnings");
+
+app.MapGet("Pesquisar EquipmentModel_SHE/{id}", async (Guid id, Contexto contexto) =>
+
+    await contexto.Equipment_model_state_hourly_earnings.FindAsync(id) is Equipment_model_state_hourly_earnings equipment_mshe
+    ? Results.Ok(equipment_mshe)
+    : Results.NotFound("Resultado nao encontrado !!"))
+    .WithTags("Equipment_model_state_hourly_earnings");
+
+app.MapPut("Atualizar EquipmentModel_SHE/{id}", async (Guid id, Equipment_model_state_hourly_earnings inputEquip, Contexto contexto) =>
+{
+    var AtualizarequipModelshe = await contexto.Equipment_model_state_hourly_earnings.FindAsync(id);
+    if (AtualizarequipModelshe is null) return Results.NotFound("Resultado nao encontrado !!");
+    AtualizarequipModelshe.Value = inputEquip.Value;
+
+    await contexto.SaveChangesAsync();
+
+    return Results.NoContent()
+    ;
+})
+    .WithTags("Equipment_model_state_hourly_earnings");
+#endregion
+
+#region Equipment Position History Actions
+app.MapPost("Adicionar Equipment Position History ", async (Equipment_position_history equipment_position, Contexto contexto) =>
+{
+    contexto.Equipment_position_history.Add(equipment_position);
+    await contexto.SaveChangesAsync();
+    return Results.Created($"/Equipamento Adicionado/{equipment_position.Equipment_id}", equipment_position);
+
+}).WithTags("Equipment Position History");
+
+app.MapDelete("Excluir Equipment Position History/{id}", async (Guid id, Contexto contexto) =>
+{
+    var equipPositionExcluir = await contexto.Equipment_position_history.FirstOrDefaultAsync(eq => eq.Equipment_id == id);
+    if (equipPositionExcluir != null)
+    {
+        contexto.Equipment_position_history.Remove(equipPositionExcluir);
+        await contexto.SaveChangesAsync();
+    }
+}).WithTags("Equipment Position History");
+
+app.MapGet("Listar Equipment Position History", async (Contexto contexto) =>
+{
+    return await contexto.Equipment_position_history.ToListAsync();
+})
+   .WithTags("Equipment Position History");
+
+app.MapGet("Pesquisar Equipment Position History/{id}", async (Guid id, Contexto contexto) =>
+
+    await contexto.Equipment_position_history.FindAsync(id) is Equipment_position_history equipment_position
+    ? Results.Ok(equipment_position)
+    : Results.NotFound("Resultado nao encontrado !!"))
+    .WithTags("Equipment Position History");
+
+app.MapPut("Atualizar Equipment Position History/{id}", async (Guid id, Equipment_position_history inputEquip, Contexto contexto) =>
+{
+    var AtualizarequipPosition = await contexto.Equipment_position_history.FindAsync(id);
+    if (AtualizarequipPosition is null) return Results.NotFound("Resultado nao encontrado !!");
+    //AtualizarequipPosition.Value = inputEquip.Value;
+
+    await contexto.SaveChangesAsync();
+
+    return Results.NoContent()
+    ;
+})
+    .WithTags("Equipment Position History");
+#endregion
 
 app.Run();

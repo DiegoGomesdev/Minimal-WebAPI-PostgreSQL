@@ -12,8 +12,8 @@ using WebAPI_Equipamentos.Contexto;
 namespace WebAPI_Equipamentos.Migrations
 {
     [DbContext(typeof(DbContext))]
-    [Migration("20220629152755_initial")]
-    partial class initial
+    [Migration("20220704175718_Inicial")]
+    partial class Inicial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -81,11 +81,11 @@ namespace WebAPI_Equipamentos.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Lat")
-                        .HasColumnType("integer");
+                    b.Property<double>("Lat")
+                        .HasColumnType("double precision");
 
-                    b.Property<int>("Lon")
-                        .HasColumnType("integer");
+                    b.Property<double>("Lon")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Equipment_id");
 
