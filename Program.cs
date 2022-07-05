@@ -169,9 +169,8 @@ app.MapDelete("Excluir Equipment Position History/{id}", async (Guid id, Context
 }).WithTags("Equipment Position History");
 
 app.MapGet("Listar Equipment Position History", async (Contexto contexto) =>
-{
-    return await contexto.Equipment_position_history.ToListAsync();
-})
+
+    await contexto.Equipment_position_history.ToListAsync())
    .WithTags("Equipment Position History");
 
 app.MapGet("Pesquisar Equipment Position History/{id}", async (Guid id, Contexto contexto) =>

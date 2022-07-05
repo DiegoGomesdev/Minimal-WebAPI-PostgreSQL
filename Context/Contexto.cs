@@ -5,7 +5,7 @@ namespace WebAPI_Equipamentos.Contexto
 {
     public class Contexto : DbContext
     {
-        public Contexto(DbContextOptions<Contexto> options) 
+        public Contexto(DbContextOptions<Contexto> options)
             : base(options) => Database.EnsureCreated();
 
         public DbSet<Equipment> Equipment { get; set; }
